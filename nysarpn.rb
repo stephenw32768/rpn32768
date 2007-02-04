@@ -30,7 +30,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
-RCSID = "$Id$"
+RCSID = "$Id: nysarpn.rb,v 1.1 2007/02/04 16:40:13 stephen Exp stephen $"
 
 
 # marker superclass from which all calculator operation classes inherit
@@ -334,7 +334,7 @@ end
 
 class ShiftLeft < Operation
   def names
-    ['shl']
+    ['<<', 'shl']
   end
   def perform(s)
     places = s.pop
@@ -344,7 +344,7 @@ end
 
 class ShiftRight < Operation
   def names
-    ['shr']
+    ['>>', 'shr']
   end
   def perform(s)
     places = s.pop
