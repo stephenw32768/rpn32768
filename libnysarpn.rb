@@ -30,7 +30,7 @@
 
 module NysaRPN
 
-  RCSID = "$Id: libnysarpn.rb,v 1.1 2007/02/10 17:10:18 stephen Exp stephen $"
+  RCSID = "$Id: libnysarpn.rb,v 1.2 2007/02/10 17:17:07 stephen Exp stephen $"
 
 
   # marker superclass from which all calculator operation classes inherit
@@ -41,9 +41,29 @@ module NysaRPN
   class BuiltinOperation < Operation
   end
 
+  # superclass from which secondary stack operations inherit
+  class SecondaryStackOperation < BuiltinOperation
+    def initialize(s)
+      @secondary = s
+    end
+
+    private
+    attr_reader :secondary
+  end
+
+
   # one class per calculator operation
   # "names" method returns the names which should invoke the operation
   # "perform" method performs the operation on the supplied stack
+
+  class Depth < BuiltinOperation
+    def names
+      ['depth', 'size']
+    end
+    def perform(s)
+      s.push(s.size)
+    end
+  end
 
   class Plus < BuiltinOperation
     def names
@@ -51,6 +71,39 @@ module NysaRPN
     end
     def perform(s)
       s.push(s.pop + s.pop)
+    end
+  end
+
+  class Increment < BuiltinOperation
+    def names
+      ['1+']
+    end
+    def perform(s)
+      s.push(s.pop + 1)
+    end
+  end
+
+  class Sum < BuiltinOperation
+    def names
+      ['sum']
+    end
+    def perform(s)
+      sum = 0
+      s.pop.to_i.times do
+        sum += s.pop
+      end
+      s.push(sum)
+    end
+  end
+
+  class SumAll < BuiltinOperation
+    def names
+      ['sumall']
+    end
+    def perform(s)
+      sum = 0
+      sum += s.pop while s.size > 0
+      s.push(sum)
     end
   end
 
@@ -63,12 +116,54 @@ module NysaRPN
     end
   end
 
+  class Decrement < BuiltinOperation
+    def names
+      ['1-']
+    end
+    def perform(s)
+      s.push(s.pop - 1)
+    end
+  end
+
   class Multiply < BuiltinOperation
     def names
       ['x', '*']
     end
     def perform(s)
       s.push(s.pop * s.pop)
+    end
+  end
+
+  class Double < BuiltinOperation
+    def names
+      ['2x', '2*']
+    end
+    def perform(s)
+      s.push(s.pop * 2)
+    end
+  end
+
+  class Product < BuiltinOperation
+    def names
+      ['product', 'prod']
+    end
+    def perform(s)
+      product = 1
+      s.pop.to_i.times do
+        product *= s.pop
+      end
+      s.push(product)
+    end
+  end
+
+  class ProductAll < BuiltinOperation
+    def names
+      ['productall', 'prodall']
+    end
+    def perform(s)
+      prod = 1
+      prod *= s.pop while s.size > 0
+      s.push(prod)
     end
   end
 
@@ -358,11 +453,22 @@ module NysaRPN
 
   class Duplicate < BuiltinOperation
     def names
-      ['d', 'dup']
+      ['dup', 'd']
     end
     def perform(s)
       i = s.pop
       s.push(i).push(i)
+    end
+  end
+
+  class DuplicateIfNonZero < BuiltinOperation
+    def names
+      ['?dup', 'nzdup']
+    end
+    def perform(s)
+      val = s.pop
+      s.push(val)
+      s.push(val) if val.to_f != 0.0
     end
   end
 
@@ -377,6 +483,30 @@ module NysaRPN
     end
   end
 
+  class Rotate < BuiltinOperation
+    def names
+      ['rot']
+    end
+    def perform(s)
+      upper = s.pop
+      middle = s.pop
+      lower = s.pop
+      s.push(middle).push(upper).push(lower)
+    end
+  end
+
+  class RotateBackwards < BuiltinOperation
+    def names
+      ['-rot']
+    end
+    def perform(s)
+      upper = s.pop
+      middle = s.pop
+      lower = s.pop
+      s.push(upper).push(lower).push(middle)
+    end
+  end
+
   class Swap < BuiltinOperation
     def names
       ['s', 'swap']
@@ -388,12 +518,91 @@ module NysaRPN
     end
   end
 
+  class Swap2 < BuiltinOperation
+    def names
+      ['2swap']
+    end
+    def perform(s)
+      upper1 = s.pop
+      lower1 = s.pop
+      upper2 = s.pop
+      lower2 = s.pop
+      s.push(lower1).push(upper1).push(lower2).push(upper2)
+    end
+  end
+
+  class Over < BuiltinOperation
+    def names
+      ['over']
+    end
+    def perform(s)
+      upper = s.pop
+      lower = s.pop
+      s.push(lower).push(upper).push(lower)
+    end
+  end
+
+  class Over2 < BuiltinOperation
+    def names
+      ['2over']
+    end
+    def perform(s)
+      upper1 = s.pop
+      lower1 = s.pop
+      upper2 = s.pop
+      lower2 = s.pop
+      s.push(lower2).push(upper2) \
+        .push(lower1).push(upper1).push(lower2).push(upper2)
+    end
+  end
+
   class Drop < BuiltinOperation
     def names
-      ['p', 'pop', 'drop']
+      ['drop']
     end
     def perform(s)
       s.pop
+    end
+  end
+
+  class Drop2 < BuiltinOperation
+    def names
+      ['2drop']
+    end
+    def perform(s)
+      s.pop
+      s.pop
+    end
+  end
+
+  class DropAll < BuiltinOperation
+    def names
+      ['dropall', 'clear']
+    end
+    def perform(s)
+      s.clear
+    end
+  end
+
+  class Nip < BuiltinOperation
+    def names
+      ['nip']
+    end
+    def perform(s)
+      upper = s.pop
+      s.pop
+      s.push(upper)
+    end
+  end
+
+  class Tuck < BuiltinOperation
+    def names
+      ['tuck']
+    end
+    def perform(s)
+      upper = s.pop
+      lower = s.pop
+      s.push(upper).push(lower).push(upper)
     end
   end
 
@@ -451,6 +660,62 @@ module NysaRPN
     end
   end
 
+  class DumpStack < BuiltinOperation
+    def names
+      ['.s']
+    end
+    def perform(s)
+      yield s.join(' ')
+    end
+  end
+
+  class SecondaryPush < SecondaryStackOperation
+    def names
+      ['push']
+    end
+    def perform(s)
+      secondary.push(s.pop)
+    end
+  end
+
+  class SecondaryPop < SecondaryStackOperation
+    def names
+      ['pop']
+    end
+    def perform(s)
+      s.push(secondary.pop)
+    end
+  end
+
+
+  class SecondaryExchange < SecondaryStackOperation
+    def names
+      ['xchg']
+    end
+    def perform(s)
+      new_secondary = s.dup
+      s.clear
+      s.concat(secondary)
+      secondary.clear
+      secondary.concat(new_secondary)
+    end
+  end
+
+
+  # Map of builtin operation names to definitions
+  BUILTIN_OPERATIONS = {}
+  ObjectSpace.each_object(Class) do |c|
+    if c.ancestors.include?(BuiltinOperation) &&
+        !c.ancestors.include?(SecondaryStackOperation) &&
+        c.public_method_defined?(:perform)
+      op = c.new
+      op.names.each do |name|
+        BUILTIN_OPERATIONS[name] = op
+      end
+    end
+  end
+  BUILTIN_OPERATIONS.freeze
+
 
   # User-defined operations consist of a sequence of numbers and
   # other operations.  Numbers are pre-parsed, and are placed
@@ -481,7 +746,7 @@ module NysaRPN
 
 
   # Things can go wrong...
-  class RPNException < Exception
+  class RPNException < StandardError
   end
   class ParseException < RPNException
   end
@@ -492,11 +757,17 @@ module NysaRPN
   # to handle, so we'll make a stack subclass that does just that
   class Stack < Array
     def pop
-      raise StackUnderflowException.new if size == 0
+      raise StackUnderflowException.new(nil, self) if size == 0
       super
     end
   end
   class StackUnderflowException < RPNException
+    attr_reader :stack
+
+    def initialize(msg = nil, stack = nil)
+      super(msg)
+      @stack = stack
+    end
   end
 
 
@@ -511,8 +782,12 @@ module NysaRPN
     # An array with a counter tracking progress through it
     class Sequence
 
-      def initialize(array)
-        @array = array
+      def initialize(args)
+        if args.kind_of?(Array)
+          @array = args
+        else
+          @array = args.to_s.split
+        end
         @i = -1
       end
 
@@ -540,13 +815,20 @@ module NysaRPN
     end
 
 
+    attr_reader :stack, :secondary_stack
+
+
+    # Constructor
     def initialize
 
-      # create map of operation names to definitions
-      @operations = {}
+      @stack = Stack.new
+      @secondary_stack = Stack.new
+
+      @operations = BUILTIN_OPERATIONS.dup
       ObjectSpace.each_object(Class) do |c|
-        if c.ancestors.include?(BuiltinOperation) && (c != BuiltinOperation)
-          op = c.new
+        if c.ancestors.include?(SecondaryStackOperation) &&
+            c.public_method_defined?(:perform)
+          op = c.new(@secondary_stack)
           op.names.each do |name|
             @operations[name] = op
           end
@@ -560,7 +842,6 @@ module NysaRPN
     # passed to the supplied block "output".  Returns anything left
     # on the stack
     def eval(args, &output)
-      stack = Stack.new
       @sequence = sequence = Sequence.new(args)
 
       # main loop
@@ -584,8 +865,11 @@ module NysaRPN
           end
 
         rescue StackUnderflowException
+          # which stack was it?
+          itwas = ($!.stack.equal?(stack)) ? "stack" : "secondary stack"
+          posn = sequence.position
           raise StackUnderflowException \
-          .new("stack underflow at argument #{sequence.position} (\"#{arg}\")")
+            .new("#{itwas} underflow at argument #{posn} (\"#{arg}\")")
         end
       end
 
@@ -626,7 +910,7 @@ module NysaRPN
           name = arg
           op = @operations[name]
           raise ParseException \
-            .new("attempted to redefine builtin \"#{name}\"" +
+            .new("attempted to redefine builtin \"#{name}\"" + \
                  " in definition starting at argument #{start}") \
             if op && op.kind_of?(BuiltinOperation)
         end
@@ -639,15 +923,20 @@ module NysaRPN
 
     # Attempts to parse the current argument in the sequence as a number
     def parse_current
-      # attempt to parse argument as a real if it contains a point
-      # otherwise assume integer
-      number_arg = @sequence.current.chomp
-      if number_arg.include?('.')
-        # the parser chokes on trailing points -- append a zero
-        number_arg << '0' if /\.$/.match(number_arg)
-        return ('%f' % number_arg).to_f
+      arg = @sequence.current
+      if arg.kind_of?(Numeric)
+        arg
       else
-        return ('%d' % number_arg).to_i
+        # attempt to parse argument as a real if it contains a point
+        # otherwise assume integer
+        number_arg = @sequence.current.chomp
+        if number_arg.include?('.')
+          # the parser chokes on trailing points -- append a zero
+          number_arg << '0' if /\.$/.match(number_arg)
+          ('%f' % number_arg).to_f
+        else
+          ('%d' % number_arg).to_i
+        end
       end
     rescue ArgumentError
       raise ParseException.new("argument #{ \
