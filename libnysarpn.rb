@@ -30,7 +30,7 @@
 
 module NysaRPN
 
-  RCSID = "$Id$"
+  RCSID = "$Id: libnysarpn.rb,v 1.1 2007/02/10 17:10:18 stephen Exp stephen $"
 
 
   # marker superclass from which all calculator operation classes inherit
@@ -624,11 +624,16 @@ module NysaRPN
         else
           # first argument is the operation's name
           name = arg
+          op = @operations[name]
+          raise ParseException \
+            .new("attempted to redefine builtin \"#{name}\"" +
+                 " in definition starting at argument #{start}") \
+            if op && op.kind_of?(BuiltinOperation)
         end
       end
 
       raise ParseException \
-      .new("definition starting at argument #{start} unterminated")
+        .new("definition starting at argument #{start} unterminated")
     end
 
 
