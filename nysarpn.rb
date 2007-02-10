@@ -30,14 +30,31 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
-RCSID = "$Id: nysarpn.rb,v 1.2 2007/02/04 17:07:18 stephen Exp stephen $"
-
+RCSID = "$Id: nysarpn.rb,v 1.3 2007/02/10 17:10:40 stephen Exp stephen $"
 
 require './libnysarpn'
+
+
+# Parses the contents of a file into an array of arguments
+def parse_file(file)
+  arr = []
+  strip_comment = /^([^\#]*)/ ;# anything after a hash mark is ignored
+
+  file.each_line do |line|
+    line = strip_comment.match(line)[1]
+    arr.concat(line.split)
+  end
+
+  arr
+end
+
+
 include NysaRPN
 
 begin
-  stack = Evaluator.new.eval(ARGV) do |result|
+  sequence = (ARGV.size > 0) ? ARGV : parse_file(STDIN)
+
+  stack = Evaluator.new.eval(sequence) do |result|
     puts(result)
   end
 
@@ -46,7 +63,7 @@ begin
     puts(stack.pop)
   end
 
-rescue Exception
+rescue RPNException
   STDERR.puts($!.message)
   exit(1)
 end
