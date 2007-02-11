@@ -30,7 +30,7 @@
 
 module NysaRPN
 
-  RCSID = "$Id: libnysarpn.rb,v 1.2 2007/02/10 17:17:07 stephen Exp stephen $"
+  RCSID = "$Id: libnysarpn.rb,v 1.3 2007/02/10 22:14:50 stephen Exp stephen $"
 
 
   # marker superclass from which all calculator operation classes inherit
@@ -49,6 +49,16 @@ module NysaRPN
 
     private
     attr_reader :secondary
+  end
+
+  # superclass from which register operations inherit
+  class RegisterOperation < BuiltinOperation
+    def initialize(r)
+      @registers = r
+    end
+
+    private
+    attr_reader :registers
   end
 
 
@@ -687,7 +697,6 @@ module NysaRPN
     end
   end
 
-
   class SecondaryExchange < SecondaryStackOperation
     def names
       ['xchg']
@@ -701,12 +710,104 @@ module NysaRPN
     end
   end
 
+  class Load < RegisterOperation
+    def names
+      ['load']
+    end
+    def perform(s)
+      r = s.pop
+      s.push(registers.has_key?(r) ? registers[r] : 0)
+    end
+  end
+
+  class Load0 < RegisterOperation
+    def names
+      ['0load']
+    end
+    def perform(s)
+      s.push(registers.has_key?(0) ? registers[0] : 0)
+    end
+  end
+
+  class Load1 < RegisterOperation
+    def names
+      ['1load']
+    end
+    def perform(s)
+      s.push(registers.has_key?(1) ? registers[1] : 0)
+    end
+  end
+
+  class Load2 < RegisterOperation
+    def names
+      ['2load']
+    end
+    def perform(s)
+      s.push(registers.has_key?(2) ? registers[2] : 0)
+    end
+  end
+
+  class Load3 < RegisterOperation
+    def names
+      ['3load']
+    end
+    def perform(s)
+      s.push(registers.has_key?(3) ? registers[3] : 0)
+    end
+  end
+
+  class Store < RegisterOperation
+    def names
+      ['store']
+    end
+    def perform(s)
+      registers[s.pop] = s.pop
+    end
+  end
+
+  class Store0 < RegisterOperation
+    def names
+      ['0store']
+    end
+    def perform(s)
+      registers[0] = s.pop
+    end
+  end
+
+  class Store1 < RegisterOperation
+    def names
+      ['1store']
+    end
+    def perform(s)
+      registers[1] = s.pop
+    end
+  end
+
+  class Store2 < RegisterOperation
+    def names
+      ['2store']
+    end
+    def perform(s)
+      registers[2] = s.pop
+    end
+  end
+
+  class Store3 < RegisterOperation
+    def names
+      ['3store']
+    end
+    def perform(s)
+      registers[3] = s.pop
+    end
+  end
+
 
   # Map of builtin operation names to definitions
   BUILTIN_OPERATIONS = {}
   ObjectSpace.each_object(Class) do |c|
     if c.ancestors.include?(BuiltinOperation) &&
         !c.ancestors.include?(SecondaryStackOperation) &&
+        !c.ancestors.include?(RegisterOperation) &&
         c.public_method_defined?(:perform)
       op = c.new
       op.names.each do |name|
@@ -815,7 +916,7 @@ module NysaRPN
     end
 
 
-    attr_reader :stack, :secondary_stack
+    attr_reader :registers, :stack, :secondary_stack
 
 
     # Constructor
@@ -823,12 +924,19 @@ module NysaRPN
 
       @stack = Stack.new
       @secondary_stack = Stack.new
+      @registers = {}
 
       @operations = BUILTIN_OPERATIONS.dup
       ObjectSpace.each_object(Class) do |c|
         if c.ancestors.include?(SecondaryStackOperation) &&
             c.public_method_defined?(:perform)
           op = c.new(@secondary_stack)
+          op.names.each do |name|
+            @operations[name] = op
+          end
+        elsif c.ancestors.include?(RegisterOperation) &&
+            c.public_method_defined?(:perform)
+          op = c.new(@registers)
           op.names.each do |name|
             @operations[name] = op
           end
