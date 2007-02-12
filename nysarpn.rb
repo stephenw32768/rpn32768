@@ -30,10 +30,12 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
-RCSID = "$Id: nysarpn.rb,v 1.3 2007/02/10 17:10:40 stephen Exp stephen $"
+RCSID = "$Id: nysarpn.rb,v 1.4 2007/02/10 22:15:09 stephen Exp stephen $"
 
 require './libnysarpn'
 
+
+STRIP_COMMENT = /^([^\#]*)/ ;# regex stripping anything after a hash mark
 
 # Parses the contents of a file into an array of arguments
 def parse_file(file)
@@ -41,7 +43,7 @@ def parse_file(file)
   strip_comment = /^([^\#]*)/ ;# anything after a hash mark is ignored
 
   file.each_line do |line|
-    line = strip_comment.match(line)[1]
+    line = STRIP_COMMENT.match(line)[1]
     arr.concat(line.split)
   end
 
@@ -51,16 +53,50 @@ end
 
 include NysaRPN
 
-begin
-  sequence = (ARGV.size > 0) ? ARGV : parse_file(STDIN)
 
-  stack = Evaluator.new.eval(sequence) do |result|
-    puts(result)
+# Runs the evaluator interactively
+def interactive(rpn)
+
+  STDERR.print("rpn> ")
+  STDIN.each_line do |line|
+    printed = false
+    begin
+      rpn.eval(STRIP_COMMENT.match(line)[1]) do |x|
+        print("#{x} ")
+        printed = true
+      end
+    rescue RPNException
+      STDERR.puts($!.message)
+    end
+    puts if printed
+    STDERR.print("rpn> ")
+  end
+end
+
+
+# Entry point
+begin
+
+  if (ARGV.size > 0)
+    sequence = ARGV
+  elsif !STDIN.tty?
+    sequence = parse_file(STDIN)
+  else
+    sequence = nil
+  end
+
+  rpn = Evaluator.new
+  if sequence
+    rpn.eval(sequence) do |result|
+      puts(result)
+    end
+  else
+    interactive(rpn)
   end
 
   # print anything left on the stack
-  while stack.size > 0
-    puts(stack.pop)
+  while rpn.stack.size > 0
+    puts(rpn.stack.pop)
   end
 
 rescue RPNException
