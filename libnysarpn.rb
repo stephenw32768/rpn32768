@@ -30,7 +30,19 @@
 
 module NysaRPN
 
-  RCSID = "$Id: libnysarpn.rb,v 1.4 2007/02/11 00:53:43 stephen Exp stephen $"
+  RCSID = "$Id: libnysarpn.rb,v 1.5 2007/02/18 14:54:49 stephen Exp stephen $"
+
+
+  # Things can go wrong...
+  class RPNException < StandardError
+  end
+  class ParseException < RPNException
+  end
+  class OperandOutOfRangeException < RPNException
+    def initialize(msg = 'operand out of range')
+      super(msg)
+    end
+  end
 
 
   # marker superclass from which all calculator operation classes inherit
@@ -41,10 +53,21 @@ module NysaRPN
   class BuiltinOperation < Operation
   end
 
+  # superclass from which stack operations inherit
+  class StackOperation < BuiltinOperation
+    def initialize(stack)
+      @s = stack
+    end
+
+    private
+    attr_reader :s
+  end
+
   # superclass from which secondary stack operations inherit
-  class SecondaryStackOperation < BuiltinOperation
-    def initialize(s)
-      @secondary = s
+  class SecondaryStackOperation < StackOperation
+    def initialize(stack, secondary)
+      super(stack)
+      @secondary = secondary
     end
 
     private
@@ -52,13 +75,30 @@ module NysaRPN
   end
 
   # superclass from which heap operations inherit
-  class HeapOperation < BuiltinOperation
-    def initialize(r)
-      @heap = r
+  class HeapOperation < StackOperation
+    def initialize(stack, heap)
+      super(stack)
+      @heap = heap
     end
 
     private
+
+    HEAP_SIZE = 65536
+    
     attr_reader :heap
+
+    class HeapAddressException < OperandOutOfRangeException
+      def initialize(msg =
+                     "bad heap address (must be int, 0 <= x < #{HEAP_SIZE})")
+        super(msg)
+      end
+    end
+
+    def check_address(a)
+      raise HeapAddressException.new \
+        if !a.kind_of?(Fixnum) || (a < 0) || (a >= HEAP_SIZE)
+      a
+    end
   end
 
 
@@ -66,38 +106,38 @@ module NysaRPN
   # "names" method returns the names which should invoke the operation
   # "perform" method performs the operation on the supplied stack
 
-  class Depth < BuiltinOperation
+  class Depth < StackOperation
     def names
       ['depth', 'size']
     end
-    def perform(s)
+    def perform
       s.push(s.size)
     end
   end
 
-  class Plus < BuiltinOperation
+  class Plus < StackOperation
     def names
       ['+']
     end
-    def perform(s)
+    def perform
       s.push(s.pop + s.pop)
     end
   end
 
-  class Increment < BuiltinOperation
+  class Increment < StackOperation
     def names
       ['1+']
     end
-    def perform(s)
+    def perform
       s.push(s.pop + 1)
     end
   end
 
-  class Sum < BuiltinOperation
+  class Sum < StackOperation
     def names
       ['sum']
     end
-    def perform(s)
+    def perform
       sum = 0
       s.pop.to_i.times do
         sum += s.pop
@@ -106,58 +146,58 @@ module NysaRPN
     end
   end
 
-  class SumAll < BuiltinOperation
+  class SumAll < StackOperation
     def names
       ['sumall']
     end
-    def perform(s)
+    def perform
       sum = 0
       sum += s.pop while s.size > 0
       s.push(sum)
     end
   end
 
-  class Minus < BuiltinOperation
+  class Minus < StackOperation
     def names
       ['-']
     end
-    def perform(s)
+    def perform
       s.push(0 - s.pop + s.pop)
     end
   end
 
-  class Decrement < BuiltinOperation
+  class Decrement < StackOperation
     def names
       ['1-']
     end
-    def perform(s)
+    def perform
       s.push(s.pop - 1)
     end
   end
 
-  class Multiply < BuiltinOperation
+  class Multiply < StackOperation
     def names
       ['x', '*']
     end
-    def perform(s)
+    def perform
       s.push(s.pop * s.pop)
     end
   end
 
-  class Double < BuiltinOperation
+  class Double < StackOperation
     def names
       ['2x', '2*']
     end
-    def perform(s)
+    def perform
       s.push(s.pop * 2)
     end
   end
 
-  class Product < BuiltinOperation
+  class Product < StackOperation
     def names
       ['product', 'prod']
     end
-    def perform(s)
+    def perform
       product = 1
       s.pop.to_i.times do
         product *= s.pop
@@ -166,69 +206,69 @@ module NysaRPN
     end
   end
 
-  class ProductAll < BuiltinOperation
+  class ProductAll < StackOperation
     def names
       ['productall', 'prodall']
     end
-    def perform(s)
+    def perform
       prod = 1
       prod *= s.pop while s.size > 0
       s.push(prod)
     end
   end
 
-  class Divide < BuiltinOperation
+  class Divide < StackOperation
     def names
       ['/']
     end
-    def perform(s)
+    def perform
       divisor = s.pop
       s.push(s.pop / divisor)
     end
   end
 
-  class Modulo < BuiltinOperation
+  class Modulo < StackOperation
     def names
       ['%', 'mod']
     end
-    def perform(s)
+    def perform
       divisor = s.pop
       s.push(s.pop % divisor)
     end
   end
 
-  class Negate < BuiltinOperation
+  class Negate < StackOperation
     def names
       ['neg']
     end
-    def perform(s)
+    def perform
       s.push(0 - s.pop)
     end
   end
 
-  class Modulus < BuiltinOperation
+  class Modulus < StackOperation
     def names
       ['abs']
     end
-    def perform(s)
+    def perform
       s.push(s.pop.abs)
     end
   end
 
-  class Reciprocal < BuiltinOperation
+  class Reciprocal < StackOperation
     def names
       ['inv']
     end
-    def perform(s)
+    def perform
       s.push(1.0 / s.pop)
     end
   end
 
-  class Factorial < BuiltinOperation
+  class Factorial < StackOperation
     def names
       ['!']
     end
-    def perform(s)
+    def perform
       s.push(factorial(s.pop))
     end
     private
@@ -241,263 +281,266 @@ module NysaRPN
     end
   end
 
-  class Square < BuiltinOperation
+  class Square < StackOperation
     def names
       ['sqr']
     end
-    def perform(s)
+    def perform
       s.push(s.pop ** 2)
     end
   end
 
-  class Raise < BuiltinOperation
+  class Raise < StackOperation
     def names
       ['**', 'pow', 'raise']
     end
-    def perform(s)
+    def perform
       power = s.pop
       s.push(s.pop ** power)
     end
   end
 
-  class SquareRoot < BuiltinOperation
+  class SquareRoot < StackOperation
     def names
       ['sqrt']
     end
-    def perform(s)
+    def perform
       s.push(Math.sqrt(s.pop))
+    rescue Errno::EDOM
+      # someone tried to sqrt a negative
+      raise OperandOutOfRangeException.new
     end
   end
 
-  class Root < BuiltinOperation
+  class Root < StackOperation
     def names
       ['root']
     end
-    def perform(s)
+    def perform
       power = (1.0 / s.pop)
       s.push(s.pop ** power)
     end
   end
 
-  class CommonLogarithm < BuiltinOperation
+  class CommonLogarithm < StackOperation
     def names
       ['log']
     end
-    def perform(s)
+    def perform
       s.push(Math.log10(s.pop))
     end
   end
 
-  class NaturalLogarithm < BuiltinOperation
+  class NaturalLogarithm < StackOperation
     def names
       ['ln']
     end
-    def perform(s)
+    def perform
       s.push(Math.log(s.pop))
     end
   end
 
-  class Euler < BuiltinOperation
+  class Euler < StackOperation
     def names
       ['e']
     end
-    def perform(s)
+    def perform
       s.push(Math::E)
     end
   end
 
-  class Pi < BuiltinOperation
+  class Pi < StackOperation
     def names
       ['pi']
     end
-    def perform(s)
+    def perform
       s.push(Math::PI)
     end
   end
 
-  class DegreesToRadians < BuiltinOperation
+  class DegreesToRadians < StackOperation
     def names
       ['dtor']
     end
-    def perform(s)
+    def perform
       s.push(s.pop * Math::PI / 180)
     end
   end
 
-  class RadiansToDegrees < BuiltinOperation
+  class RadiansToDegrees < StackOperation
     def names
       ['rtod']
     end
-    def perform(s)
+    def perform
       s.push(s.pop * 180 / Math::PI)
     end
   end
 
-  class Sine < BuiltinOperation
+  class Sine < StackOperation
     def names
       ['sin']
     end
-    def perform(s)
+    def perform
       s.push(Math.sin(s.pop))
     end
   end
 
-  class InverseSine < BuiltinOperation
+  class InverseSine < StackOperation
     def names
       ['asin']
     end
-    def perform(s)
+    def perform
       s.push(Math.asin(s.pop))
     end
   end
 
-  class Cosine < BuiltinOperation
+  class Cosine < StackOperation
     def names
       ['cos']
     end
-    def perform(s)
+    def perform
       s.push(Math.cos(s.pop))
     end
   end
 
-  class InverseCosine < BuiltinOperation
+  class InverseCosine < StackOperation
     def names
       ['acos']
     end
-    def perform(s)
+    def perform
       s.push(Math.acos(s.pop))
     end
   end
 
-  class Tangent < BuiltinOperation
+  class Tangent < StackOperation
     def names
       ['tan']
     end
-    def perform(s)
+    def perform
       s.push(Math.tan(s.pop))
     end
   end
 
-  class InverseTangent < BuiltinOperation
+  class InverseTangent < StackOperation
     def names
       ['atan']
     end
-    def perform(s)
+    def perform
       s.push(Math.atan(s.pop))
     end
   end
 
-  class FahrenheitToCentigrade < BuiltinOperation
+  class FahrenheitToCentigrade < StackOperation
     def names
       ['ftoc']
     end
-    def perform(s)
+    def perform
       s.push((s.pop - 32) * 5 / 9)
     end
   end
 
-  class CentigradeToFahrenheit < BuiltinOperation
+  class CentigradeToFahrenheit < StackOperation
     def names
       ['ctof']
     end
-    def perform(s)
+    def perform
       s.push(s.pop * 9 / 5 + 32)
     end
   end
 
-  class BitwiseAnd < BuiltinOperation
+  class BitwiseAnd < StackOperation
     def names
       ['&', 'and']
     end
-    def perform(s)
+    def perform
       s.push(s.pop.to_i & s.pop.to_i)
     end
   end
 
-  class BitwiseOr < BuiltinOperation
+  class BitwiseOr < StackOperation
     def names
       ['|', 'or']
     end
-    def perform(s)
+    def perform
       s.push(s.pop.to_i | s.pop.to_i)
     end
   end
 
-  class BitwiseXor < BuiltinOperation
+  class BitwiseXor < StackOperation
     def names
       ['^', 'xor']
     end
-    def perform(s)
+    def perform
       s.push(s.pop.to_i ^ s.pop.to_i)
     end
   end
 
-  class BitwiseNot < BuiltinOperation
+  class BitwiseNot < StackOperation
     def names
       ['~', 'not']
     end
-    def perform(s)
+    def perform
       s.push(~(s.pop.to_i))
     end
   end
 
-  class ShiftLeft < BuiltinOperation
+  class ShiftLeft < StackOperation
     def names
       ['<<', 'shl']
     end
-    def perform(s)
+    def perform
       places = s.pop
       s.push(s.pop << places)
     end
   end
 
-  class ShiftRight < BuiltinOperation
+  class ShiftRight < StackOperation
     def names
       ['>>', 'shr']
     end
-    def perform(s)
+    def perform
       places = s.pop
       s.push(s.pop >> places)
     end
   end
 
-  class Duplicate < BuiltinOperation
+  class Duplicate < StackOperation
     def names
       ['dup', 'd']
     end
-    def perform(s)
+    def perform
       i = s.pop
       s.push(i).push(i)
     end
   end
 
-  class DuplicateIfNonZero < BuiltinOperation
+  class DuplicateIfNonZero < StackOperation
     def names
       ['?dup', 'nzdup']
     end
-    def perform(s)
+    def perform
       val = s.pop
       s.push(val)
       s.push(val) if val.to_f != 0.0
     end
   end
 
-  class Duplicate2 < BuiltinOperation
+  class Duplicate2 < StackOperation
     def names
       ['2dup']
     end
-    def perform(s)
+    def perform
       x = s.pop
       y = s.pop
       s.push(y).push(x).push(y).push(x)
     end
   end
 
-  class Rotate < BuiltinOperation
+  class Rotate < StackOperation
     def names
       ['rot']
     end
-    def perform(s)
+    def perform
       upper = s.pop
       middle = s.pop
       lower = s.pop
@@ -505,11 +548,11 @@ module NysaRPN
     end
   end
 
-  class RotateBackwards < BuiltinOperation
+  class RotateBackwards < StackOperation
     def names
       ['-rot']
     end
-    def perform(s)
+    def perform
       upper = s.pop
       middle = s.pop
       lower = s.pop
@@ -517,22 +560,22 @@ module NysaRPN
     end
   end
 
-  class Swap < BuiltinOperation
+  class Swap < StackOperation
     def names
       ['s', 'swap']
     end
-    def perform(s)
+    def perform
       upper = s.pop
       lower = s.pop
       s.push(upper).push(lower)
     end
   end
 
-  class Swap2 < BuiltinOperation
+  class Swap2 < StackOperation
     def names
       ['2swap']
     end
-    def perform(s)
+    def perform
       upper1 = s.pop
       lower1 = s.pop
       upper2 = s.pop
@@ -541,22 +584,22 @@ module NysaRPN
     end
   end
 
-  class Over < BuiltinOperation
+  class Over < StackOperation
     def names
       ['over']
     end
-    def perform(s)
+    def perform
       upper = s.pop
       lower = s.pop
       s.push(lower).push(upper).push(lower)
     end
   end
 
-  class Over2 < BuiltinOperation
+  class Over2 < StackOperation
     def names
       ['2over']
     end
-    def perform(s)
+    def perform
       upper1 = s.pop
       lower1 = s.pop
       upper2 = s.pop
@@ -566,115 +609,115 @@ module NysaRPN
     end
   end
 
-  class Drop < BuiltinOperation
+  class Drop < StackOperation
     def names
       ['drop']
     end
-    def perform(s)
+    def perform
       s.pop
     end
   end
 
-  class Drop2 < BuiltinOperation
+  class Drop2 < StackOperation
     def names
       ['2drop']
     end
-    def perform(s)
+    def perform
       s.pop
       s.pop
     end
   end
 
-  class DropAll < BuiltinOperation
+  class DropAll < StackOperation
     def names
       ['dropall', 'clear']
     end
-    def perform(s)
+    def perform
       s.clear
     end
   end
 
-  class Nip < BuiltinOperation
+  class Nip < StackOperation
     def names
       ['nip']
     end
-    def perform(s)
+    def perform
       upper = s.pop
       s.pop
       s.push(upper)
     end
   end
 
-  class Tuck < BuiltinOperation
+  class Tuck < StackOperation
     def names
       ['tuck']
     end
-    def perform(s)
+    def perform
       upper = s.pop
       lower = s.pop
       s.push(upper).push(lower).push(upper)
     end
   end
 
-  class ToInteger < BuiltinOperation
+  class ToInteger < StackOperation
     def names
       ['to_i']
     end
-    def perform(s)
+    def perform
       s.push(s.pop.to_i)
     end
   end
 
-  class ToReal < BuiltinOperation
+  class ToReal < StackOperation
     def names
       ['to_f', 'to_r']
     end
-    def perform(s)
+    def perform
       s.push(s.pop.to_f)
     end
   end
 
-  class Print < BuiltinOperation
+  class Print < StackOperation
     def names
       ['.']
     end
-    def perform(s)
+    def perform
       yield s.pop
     end
   end
 
-  class PrintHex < BuiltinOperation
+  class PrintHex < StackOperation
     def names
       ['.x']
     end
-    def perform(s)
+    def perform
       yield "0x#{'%x' % s.pop}"
     end
   end
 
-  class PrintOctal < BuiltinOperation
+  class PrintOctal < StackOperation
     def names
       ['.o']
     end
-    def perform(s)
+    def perform
       yield "0#{'%o' % s.pop}"
     end
   end
 
-  class PrintBinary < BuiltinOperation
+  class PrintBinary < StackOperation
     def names
       ['.b']
     end
-    def perform(s)
+    def perform
       yield "0b#{'%b' % s.pop}"
     end
   end
 
-  class DumpStack < BuiltinOperation
+  class DumpStack < StackOperation
     def names
       ['.s']
     end
-    def perform(s)
+    def perform
       yield s.join(' ')
     end
   end
@@ -683,7 +726,7 @@ module NysaRPN
     def names
       ['push']
     end
-    def perform(s)
+    def perform
       secondary.push(s.pop)
     end
   end
@@ -692,7 +735,7 @@ module NysaRPN
     def names
       ['pop']
     end
-    def perform(s)
+    def perform
       s.push(secondary.pop)
     end
   end
@@ -701,7 +744,8 @@ module NysaRPN
     def names
       ['xchg']
     end
-    def perform(s)
+    def perform
+      # this implementation is disgusting
       new_secondary = s.dup
       s.clear
       s.concat(secondary)
@@ -714,9 +758,9 @@ module NysaRPN
     def names
       ['load']
     end
-    def perform(s)
-      r = s.pop
-      s.push(heap.has_key?(r) ? heap[r] : 0)
+    def perform
+      a = check_address(s.pop)
+      s.push(heap.has_key?(a) ? heap[a] : 0)
     end
   end
 
@@ -724,7 +768,7 @@ module NysaRPN
     def names
       ['0load']
     end
-    def perform(s)
+    def perform
       s.push(heap.has_key?(0) ? heap[0] : 0)
     end
   end
@@ -733,7 +777,7 @@ module NysaRPN
     def names
       ['1load']
     end
-    def perform(s)
+    def perform
       s.push(heap.has_key?(1) ? heap[1] : 0)
     end
   end
@@ -742,7 +786,7 @@ module NysaRPN
     def names
       ['2load']
     end
-    def perform(s)
+    def perform
       s.push(heap.has_key?(2) ? heap[2] : 0)
     end
   end
@@ -751,7 +795,7 @@ module NysaRPN
     def names
       ['3load']
     end
-    def perform(s)
+    def perform
       s.push(heap.has_key?(3) ? heap[3] : 0)
     end
   end
@@ -760,8 +804,9 @@ module NysaRPN
     def names
       ['store']
     end
-    def perform(s)
-      heap[s.pop] = s.pop
+    def perform
+      a = check_address(s.pop)
+      heap[a] = s.pop
     end
   end
 
@@ -769,7 +814,7 @@ module NysaRPN
     def names
       ['0store']
     end
-    def perform(s)
+    def perform
       heap[0] = s.pop
     end
   end
@@ -778,7 +823,7 @@ module NysaRPN
     def names
       ['1store']
     end
-    def perform(s)
+    def perform
       heap[1] = s.pop
     end
   end
@@ -787,7 +832,7 @@ module NysaRPN
     def names
       ['2store']
     end
-    def perform(s)
+    def perform
       heap[2] = s.pop
     end
   end
@@ -796,26 +841,10 @@ module NysaRPN
     def names
       ['3store']
     end
-    def perform(s)
+    def perform
       heap[3] = s.pop
     end
   end
-
-
-  # Map of builtin operation names to definitions
-  BUILTIN_OPERATIONS = {}
-  ObjectSpace.each_object(Class) do |c|
-    if c.ancestors.include?(BuiltinOperation) &&
-        !c.ancestors.include?(SecondaryStackOperation) &&
-        !c.ancestors.include?(HeapOperation) &&
-        c.public_method_defined?(:perform)
-      op = c.new
-      op.names.each do |name|
-        BUILTIN_OPERATIONS[name] = op
-      end
-    end
-  end
-  BUILTIN_OPERATIONS.freeze
 
 
   # User-defined operations consist of a sequence of numbers and
@@ -823,8 +852,9 @@ module NysaRPN
   # directly on the stack.  Operations are performed.
   class CustomOperation < Operation
 
-    def initialize(name, sequence)
+    def initialize(name, stack, sequence)
       @name = name
+      @s = stack
       @sequence = sequence
     end
 
@@ -832,10 +862,10 @@ module NysaRPN
       [@name]
     end
 
-    def perform(s)
-      @sequence.each do |arg|
+    def perform
+      sequence.each do |arg|
         if arg.kind_of?(Operation)
-          arg.perform(s) do |result|
+          arg.perform do |result|
             yield result
           end
         else
@@ -843,13 +873,9 @@ module NysaRPN
         end
       end
     end
-  end
 
-
-  # Things can go wrong...
-  class RPNException < StandardError
-  end
-  class ParseException < RPNException
+    private
+    attr_reader :s, :sequence
   end
 
 
@@ -926,17 +952,21 @@ module NysaRPN
       @secondary_stack = Stack.new
       @heap = {}
 
-      @operations = BUILTIN_OPERATIONS.dup
+      @operations = {}
       ObjectSpace.each_object(Class) do |c|
-        if c.ancestors.include?(SecondaryStackOperation) &&
+        op = nil
+        if c.ancestors.include?(HeapOperation) &&
             c.public_method_defined?(:perform)
-          op = c.new(@secondary_stack)
-          op.names.each do |name|
-            @operations[name] = op
-          end
-        elsif c.ancestors.include?(HeapOperation) &&
+          op = c.new(@stack, @heap)
+        elsif c.ancestors.include?(SecondaryStackOperation) &&
             c.public_method_defined?(:perform)
-          op = c.new(@heap)
+          op = c.new(@stack, @secondary_stack)
+        elsif c.ancestors.include?(StackOperation) &&
+            c.public_method_defined?(:perform)
+          op = c.new(@stack)
+        end
+
+        if op
           op.names.each do |name|
             @operations[name] = op
           end
@@ -966,7 +996,7 @@ module NysaRPN
 
           op = @operations[name]
           if op
-            op.perform(stack, &output)
+            op.perform(&output)
           else
             # parse argument as number and push it
             stack.push(parse_current)
@@ -978,6 +1008,10 @@ module NysaRPN
           posn = sequence.position
           raise StackUnderflowException \
             .new("#{itwas} underflow at argument #{posn} (\"#{arg}\")")
+        rescue OperandOutOfRangeException
+          # rethrow with context
+          posn = sequence.position
+          raise $!.class.new("#{$!.message} at argument #{posn} (\"#{arg}\")")
         end
       end
 
@@ -1001,7 +1035,8 @@ module NysaRPN
         if DEFINITION_END.match(arg)
           raise ParseException \
             .new("empty definition at argument #{start}") unless name
-          @operations[name] = CustomOperation.new(name, operation_sequence)
+          @operations[name] =
+            CustomOperation.new(name, stack, operation_sequence)
           return
         elsif DEFINITION_START.match(arg)
           raise ParseException \
