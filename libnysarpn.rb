@@ -1,7 +1,7 @@
 #
 # RPN evaluator
 #
-# Copyright (c) 2007 Stephen Williams, all rights reserved.
+# Copyright (c) 2007-2013 Stephen Williams, all rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -30,7 +30,7 @@
 
 module NysaRPN
 
-  RCSID = "$Id: libnysarpn.rb,v 1.5 2007/02/18 14:54:49 stephen Exp stephen $"
+  RCSID = "$Id: libnysarpn.rb,v 1.6 2007/02/18 16:30:58 stephen Exp stephen $"
 
 
   # Things can go wrong...
@@ -457,6 +457,17 @@ module NysaRPN
     end
   end
 
+  class BitwiseAndAll < StackOperation
+    def names
+      ['&all', 'andall']
+    end
+    def perform
+      x = s.pop
+      x &= s.pop while s.size > 0
+      s.push(x)
+    end
+  end
+
   class BitwiseOr < StackOperation
     def names
       ['|', 'or']
@@ -466,12 +477,34 @@ module NysaRPN
     end
   end
 
+  class BitwiseOrAll < StackOperation
+    def names
+      ['|all', 'orall']
+    end
+    def perform
+      x = 0
+      x |= s.pop while s.size > 0
+      s.push(x)
+    end
+  end
+
   class BitwiseXor < StackOperation
     def names
       ['^', 'xor']
     end
     def perform
       s.push(s.pop.to_i ^ s.pop.to_i)
+    end
+  end
+
+  class BitwiseXorAll < StackOperation
+    def names
+      ['^all', 'xorall']
+    end
+    def perform
+      x = 0
+      x ^= s.pop while s.size > 0
+      s.push(x)
     end
   end
 
