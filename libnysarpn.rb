@@ -1,7 +1,7 @@
 #
 # RPN evaluator
 #
-# Copyright (c) 2007-2013 Stephen Williams, all rights reserved.
+# Copyright (c) 2007-2024 Stephen Williams, all rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -30,7 +30,7 @@
 
 module NysaRPN
 
-  RCSID = "$Id: libnysarpn.rb,v 1.6 2007/02/18 16:30:58 stephen Exp stephen $"
+  RCSID = "$Id: libnysarpn.rb,v 1.7 2013/06/16 12:59:48 stephen Exp stephen $"
 
 
   # Things can go wrong...
@@ -96,7 +96,7 @@ module NysaRPN
 
     def check_address(a)
       raise HeapAddressException.new \
-        if !a.kind_of?(Fixnum) || (a < 0) || (a >= HEAP_SIZE)
+        if !a.kind_of?(Integer) || (a < 0) || (a >= HEAP_SIZE)
       a
     end
   end
