@@ -30,8 +30,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
-RCSID = "$Id: nysarpn.rb,v 1.4 2007/02/10 22:15:09 stephen Exp stephen $"
-
 require './libnysarpn'
 
 

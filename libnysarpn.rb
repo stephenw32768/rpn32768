@@ -30,9 +30,6 @@
 
 module NysaRPN
 
-  RCSID = "$Id: libnysarpn.rb,v 1.7 2013/06/16 12:59:48 stephen Exp stephen $"
-
-
   # Things can go wrong...
   class RPNException < StandardError
   end
