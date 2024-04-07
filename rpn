@@ -1,0 +1,5 @@
+#!/bin/sh -e
+
+install_dir=/home/stephen/share/ruby/rpn32768
+
+exec ruby "$install_dir"/rpn32768.rb ${1+"$@"}
