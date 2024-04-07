@@ -30,8 +30,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
-require './libnysarpn'
-
+require './librpn32768'
 
 STRIP_COMMENT = /^([^\#]*)/ ;# regex stripping anything after a hash mark
 
@@ -49,7 +48,7 @@ def parse_file(file)
 end
 
 
-include NysaRPN
+include RPN32768
 
 
 # Runs the evaluator interactively

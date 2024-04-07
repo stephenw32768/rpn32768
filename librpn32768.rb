@@ -28,7 +28,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
-module NysaRPN
+module RPN32768
 
   # Things can go wrong...
   class RPNException < StandardError
