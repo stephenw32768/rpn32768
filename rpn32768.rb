@@ -37,7 +37,6 @@ STRIP_COMMENT = /^([^\#]*)/ ;# regex stripping anything after a hash mark
 # Parses the contents of a file into an array of arguments
 def parse_file(file)
   arr = []
-  strip_comment = /^([^\#]*)/ ;# anything after a hash mark is ignored
 
   file.each_line do |line|
     line = STRIP_COMMENT.match(line)[1]
