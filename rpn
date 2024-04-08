@@ -3,11 +3,12 @@
 install_dir=/home/stephen/share/ruby/rpn32768
 state_dir=${XDG_STATE_HOME:-$HOME/.local/state}/rpn32768
 
+rlwrap=''
 if [ $# -eq 0 ] && which >/dev/null 2>&1 rlwrap
 then
   RLWRAP_HOME="$state_dir"
   export RLWRAP_HOME
-  exec rlwrap -C rpn32768 ruby "$install_dir"/rpn32768.rb
+  rlwrap="rlwrap -C rpn32768"
 fi
 
-exec ruby "$install_dir"/rpn32768.rb ${1+"$@"}
+exec $rlwrap ruby -I "$install_dir" "$install_dir"/rpn32768.rb ${1+"$@"}

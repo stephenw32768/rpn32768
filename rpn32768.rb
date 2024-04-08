@@ -30,7 +30,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
-require './librpn32768'
+require 'librpn32768'
 
 STRIP_COMMENT = /^([^\#]*)/ ;# regex stripping anything after a hash mark
 
