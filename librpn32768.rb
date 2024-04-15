@@ -28,6 +28,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
+#noinspection RubyInstanceVariableNamingConvention, RubyClassModuleNamingConvention
 module RPN32768
 
   # Things can go wrong...

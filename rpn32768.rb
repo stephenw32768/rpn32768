@@ -32,7 +32,7 @@
 
 require 'librpn32768'
 
-STRIP_COMMENT = /^([^\#]*)/ ;# regex stripping anything after a hash mark
+STRIP_COMMENT = /^([^#]*)/ ;# regex stripping anything after a hash mark
 
 # Parses the contents of a file into an array of arguments
 def parse_file(file)
@@ -73,7 +73,7 @@ end
 # Entry point
 begin
 
-  if (ARGV.size > 0)
+  if ARGV.size > 0
     sequence = ARGV
   elsif !STDIN.tty?
     sequence = parse_file(STDIN)
