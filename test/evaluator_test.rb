@@ -61,11 +61,23 @@ class EvaluatorTest < Test::Unit::TestCase
     assert_equal rpn.stack, [47, 32768]
   end
 
+  def test_stack_is_returned
+    rpn = Evaluator.new
+    assert_equal rpn.eval("1 2 3"), [1, 2, 3]
+  end
+
   def test_alias
     rpn = Evaluator.new
     rpn.eval("def tau 2 pi * end")
     rpn.eval("tau")
     assert_equal rpn.stack, [2 * Math::PI]
+  end
+
+  def test_print_binary
+    rpn = Evaluator.new
+    rpn.eval("3 .b") do |result|
+      assert_equal result, "0b11"
+    end
   end
 
   def test_operator_addition
