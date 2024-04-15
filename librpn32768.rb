@@ -1015,13 +1015,6 @@ module RPN32768
           end
         end
       end
-
-      @help = {}
-      # each help is delimited with a blank line
-      IO.read('help.txt').split(/\r?\n\s*\r?\n/).map do |help_lines|
-        help = Help.new(help_lines.split(/\r?\n/))
-        @help[help.op_name] = help
-      end
     end
 
 
@@ -1138,6 +1131,26 @@ module RPN32768
     rescue ArgumentError
       raise ParseException.new("argument #{ \
           @sequence.position} (\"#{@sequence.current}\") unparseable")
+    end
+
+    # Lazy-loaded help
+    def help
+      return @help if defined?(@help)
+
+      # find the help on the load path
+      $LOAD_PATH.map{|p| "#{p}/rpn32768help.txt"}.each do |path|
+        if File.exist?(path)
+          @help = {}
+          # each help is delimited with a blank line
+          IO.read(path).split(/\r?\n\s*\r?\n/).map do |help_lines|
+            help = Help.new(help_lines.split(/\r?\n/))
+            @help[help.op_name] = help
+          end
+          return @help
+        end
+      end
+
+      raise StandardError('Help file rpn32768help.txt not found')
     end
 
     # Shows documentation
