@@ -21,7 +21,7 @@ task :install, [:prefix] do |t, args|
     end
     FileUtils.cp(['librpn32768.rb', 'rpn32768.rb', 'rpn32768help.txt'], install_dir)
   else
-    puts "Usage: rake install PREFIX"
+    puts "Usage: rake install[PREFIX]"
     puts "e.g. if PREFIX is /usr/local, installs to /usr/local/share/ruby"
     puts "and puts the wrapper script in /usr/local/bin"
   end
