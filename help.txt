@@ -1,0 +1,44 @@
++ Adds two numbers
+Pops two numbers from the stack, adds them, and pushes the result back on the
+stack.
+Example: 1 2 +
+Result: 3
+
+- Subtracts a number from another
+Pops two numbers from the stack, subtracts the first to be popped from the
+second, and pushes the result back on the stack.
+Example: 10 6 -
+Result: 4
+
+* Multiplies two numbers
+Pops two numbers from the stack, multiplies them, and pushes the result back on the
+stack.
+Example: 3 2 *
+Result: 6
+
+/ Divides a number by another
+Pops two numbers from the stack, divides the second to be popped by the
+first, and pushes the result back on the stack.
+Example: 7 2.0 /
+Result: 3.5
+
+sumall Adds all the numbers on the stack
+Pops the entire stack, adds all the numbers, and pushes the result back on
+the stack.
+Example: 1 3 5 sumall
+Result: 9
+
+. Output the number on the top of the stack
+Pops the number on top of the stack and prints it in decimal.
+Example: 1 2 .
+Result: Prints 2, leaves 1 on the stack
+ 
+.b Output the number on the top of the stack in binary
+Pops the number on top of the stack and prints it in binary.
+Example: 1 3 .x
+Result: Prints 0b11, leaves 1 on the stack
+ 
+.x Output the number on the top of the stack in hex
+Pops the number on top of the stack and prints it in hex.
+Example: 1 10 .x
+Result: Prints 0xa, leaves 1 on the stack

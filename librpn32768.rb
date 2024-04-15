@@ -930,10 +930,12 @@ module RPN32768
   # RPN evaluation engine.  Not thread-safe
   class Evaluator
 
-    # Tokens which start and end op definitions
+    # Tokens which start and end alias definitions
     DEFINITION_START = /^(:|def)$/
     DEFINITION_END = /^(;|end)$/
 
+    # Tokens for displaying help
+    HELP = 'help'
 
     # An array with a counter tracking progress through it
     class Sequence
@@ -970,8 +972,19 @@ module RPN32768
       end
     end
 
+    class Help
+      attr_reader :op_name, :short, :full
 
-    attr_reader :heap, :stack, :secondary_stack
+      # The first line is the operator name followed by the short description.
+      # The rest of the lines are the full description
+      def initialize(lines)
+        @op_name = lines[0].sub(/\s.*/, '')
+        @short = lines[0].sub(/^\S+\s/, '')
+        @full = lines.drop(1)
+      end
+    end
+
+    attr_reader :heap, :stack, :secondary_stack, :help
 
 
     # Constructor
@@ -1003,6 +1016,12 @@ module RPN32768
         end
       end
 
+      @help = {}
+      # each help is delimited with a blank line
+      IO.read('help.txt').split(/\r?\n\s*\r?\n/).map do |help_lines|
+        help = Help.new(help_lines.split(/\r?\n/))
+        @help[help.op_name] = help
+      end
     end
 
 
@@ -1021,6 +1040,11 @@ module RPN32768
 
           if DEFINITION_START.match(name)
             define_alias
+            next
+          end
+
+          if name == HELP
+            show_help(&output)
             next
           end
 
@@ -1116,6 +1140,13 @@ module RPN32768
           @sequence.position} (\"#{@sequence.current}\") unparseable")
     end
 
+    # Shows documentation
+    def show_help
+      longest_op_name = help.keys.map{|s| s.length}.max
+      help.keys.sort.each do |op_name|
+        yield "#{op_name.ljust(longest_op_name)} #{help[op_name].short}"
+      end
+    end
   end
 
 end

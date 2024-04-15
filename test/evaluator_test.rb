@@ -85,4 +85,13 @@ class EvaluatorTest < Test::Unit::TestCase
     rpn.eval("1 2 +")
     assert_equal [3], rpn.stack
   end
+
+  def test_help
+    rpn = Evaluator.new
+    output = []
+    rpn.eval("help") do |result|
+      output << result
+    end
+    assert_not_empty output.filter{|s| s.match(/^sumall\s+Adds all the numbers on the stack$/)}
+  end
 end
