@@ -95,6 +95,16 @@ class EvaluatorTest < Test::Unit::TestCase
     assert_not_empty output.filter{|s| s.match(/^sumall\s+Adds all the numbers on the stack$/)}
   end
 
+  def test_help_full
+    rpn = Evaluator.new
+    output = []
+    rpn.eval("help full") do |result|
+      output << result
+    end
+    assert_not_empty output.filter{|s| s.match(/^\*\s+Multiplies two numbers$/)}
+    assert_not_empty output.filter{|s| s.match(/^x\s+Multiplies two numbers$/)}
+  end
+
   def test_help_op
     rpn = Evaluator.new
     output = []

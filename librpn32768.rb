@@ -1141,29 +1141,58 @@ module RPN32768
     end
 
     # Shows documentation
-    def show_help
+    def show_help(&output)
       if @sequence.has_next?
-        op = @operations[@sequence.next]
-        raise ParseException.new("no such operator \"#{@sequence.current}\"") unless op
-        h = op.names.map{|n| help[n]}.filter{|x| x}[0]
-        if h
-          yield "Operator: #{h.op_name}"
-          yield "Synonyms: #{op.names.join(", ")}" if op.names.length > 1
-          yield h.short
-          yield ''
-          h.full.each do |line|
-            yield line
-          end
+        arg = @sequence.next
+        if arg == 'full'
+          show_help_list(true, &output)
         else
-          yield "No help available for operator \"#{@sequence.current}\""
+          op = @operations[arg]
+          raise ParseException.new("no such operator \"#{@sequence.current}\"") unless op
+          show_op_help(op, &output)
         end
-      else 
-        longest_op_name = help.keys.map{|s| s.length}.max
-        help.keys.sort.each do |op_name|
-          yield "#{op_name.ljust(longest_op_name)} #{help[op_name].short}"
+      else
+        show_help_list(false, &output)
+      end
+    end
+
+    # Shows documentation for a single operator
+    def show_op_help(op)
+      h = op.names.map { |n| help[n] }.filter { |x| x }[0]
+      if h
+        yield "Operator: #{h.op_name}"
+        yield "Synonyms: #{op.names.join(", ")}" if op.names.length > 1
+        yield h.short
+        yield ''
+        h.full.each do |line|
+          yield line
         end
+      else
+        yield "No help available for operator \"#{@sequence.current}\""
+      end
+    end
+
+    # Lists known operators
+    def show_help_list(show_synonyms)
+      op_names = help.keys
+      op_names = @operations.values.flat_map { |op| op.names } if show_synonyms
+      longest_op_name = op_names.map { |s| s.length }.max
+
+      list = []
+      help.keys.each do |op_name|
+        synonyms = [op_name]
+        synonyms = @operations[op_name].names if show_synonyms
+        synonyms.each do |synonym|
+          list << "#{synonym.ljust(longest_op_name)} #{help[op_name].short}"
+        end
+      end
+      list.sort.each { |x| yield x }
+
+      yield ''
+      yield "For a full description of OPERATOR, use 'help OPERATOR'."
+      if !show_synonyms
+        yield "Some operators have synonyms, use 'help full' for a complete list."
       end
     end
   end
-
 end
