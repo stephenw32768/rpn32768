@@ -48,6 +48,26 @@ class EvaluatorTest < Test::Unit::TestCase
     assert_equal rpn.stack, [3276.8]
   end
 
+  def test_stack_exchange
+    rpn = Evaluator.new
+    rpn.eval("32768 xchg")
+    assert_equal rpn.stack, []
+    assert_equal rpn.secondary_stack, [32768]
+  end
+
+  def test_heap_store_load
+    rpn = Evaluator.new
+    rpn.eval("32768 0store 47 0load")
+    assert_equal rpn.stack, [47, 32768]
+  end
+
+  def test_alias
+    rpn = Evaluator.new
+    rpn.eval("def tau 2 pi * end")
+    rpn.eval("tau")
+    assert_equal rpn.stack, [2 * Math::PI]
+  end
+
   def test_operator_addition
     rpn = Evaluator.new
     rpn.eval("1 2 +")
