@@ -879,10 +879,10 @@ module RPN32768
   end
 
 
-  # User-defined operations consist of a sequence of numbers and
-  # other operations.  Numbers are pre-parsed, and are placed
-  # directly on the stack.  Operations are performed.
-  class CustomOperation < Operation
+  # Aliases consist of a sequence of numbers and operations.  Numbers are
+  # #pre-parsed, and are placed directly on the stack.  Operations are
+  # performed.
+  class Alias < Operation
 
     def initialize(name, stack, sequence)
       @name = name
@@ -985,6 +985,7 @@ module RPN32768
       @heap = {}
 
       @operations = {}
+      @aliases = {}
       ObjectSpace.each_object(Class) do |c|
         op = nil
         if c.ancestors.include?(HeapOperation) &&
@@ -1022,11 +1023,12 @@ module RPN32768
           name = arg.chomp.downcase
 
           if DEFINITION_START.match(name)
-            define_operation
+            define_alias
             next
           end
 
           op = @operations[name]
+          op = @aliases[name] if op == nil
           if op
             op.perform(&output)
           else
@@ -1053,9 +1055,8 @@ module RPN32768
 
     private
 
-    # Parses the sequence until an end token is found.
-    # Uses the parsed sequence to generate a custom operator
-    def define_operation
+    # Parses the sequence until an end token is found.  Uses the parsed sequence to generate an alias
+    def define_alias
       sequence = @sequence
       start = sequence.position
       name = nil
@@ -1067,8 +1068,8 @@ module RPN32768
         if DEFINITION_END.match(arg)
           raise ParseException \
             .new("empty definition at argument #{start}") unless name
-          @operations[name] =
-            CustomOperation.new(name, stack, operation_sequence)
+          @aliases[name] =
+            Alias.new(name, stack, operation_sequence)
           return
         elsif DEFINITION_START.match(arg)
           raise ParseException \
@@ -1085,9 +1086,9 @@ module RPN32768
           name = arg
           op = @operations[name]
           raise ParseException \
-            .new("attempted to redefine builtin \"#{name}\"" + \
+            .new("attempted to redefine operation \"#{name}\"" + \
                  " in definition starting at argument #{start}") \
-            if op && op.kind_of?(BuiltinOperation)
+            if op
         end
       end
 
