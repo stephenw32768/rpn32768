@@ -48,12 +48,8 @@ module RPN32768
   class Operation
   end
 
-  # marker superclass from which all builtin operation classes inherit
-  class BuiltinOperation < Operation
-  end
-
   # superclass from which stack operations inherit
-  class StackOperation < BuiltinOperation
+  class StackOperation < Operation
     def initialize(stack)
       @s = stack
     end
