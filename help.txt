@@ -208,6 +208,56 @@ Result: 3.141592653589793
 Example: -1 atan rtod
 Result: -45
 
+ftoc Fahrenheit to Celsius
+Pops a number from the stack.  Takes the popped number to be a temperature in
+degrees Fahrenheit.  Pushes the equivalent temperature in degrees Celsius
+onto the stack.
+Example: 212 ftoc
+Result: 100
+
+ctof Celsius to Fahrenheit
+Pops a number from the stack.  Takes the popped number to be a temperature in
+degrees Celsius.  Pushes the equivalent temperature in degrees Fahrenheit
+onto the stack.
+Example: 37.0 ctof
+Result: 98.6
+
+& Combines two numbers using bitwise-and.
+Pops two numbers from the stack.  Combines them bitwise using the "and"
+operator.  Pushes the result back on the stack.
+Example: 0b11011 0b10110 & .b
+Result: 0b10010
+
+&all Combines the entire stack using bitwise-and.
+Pops the entire stack.  Combines all the number bitwise using the "and"
+operator.  Pushes the result back on the stack.
+Example: 0b11011 0b10110 0b11101 &all .b
+Result: 0b10000
+
+| Combines two numbers using bitwise-or.
+Pops two numbers from the stack.  Combines them bitwise using the "or"
+operator.  Pushes the result back on the stack.
+Example: 0b01001 0b10011 | .b
+Result: 0b11011
+
+|all Combines the entire stack using bitwise-or.
+Pops the entire stack.  Combines all the number bitwise using the "or"
+operator.  Pushes the result back on the stack.
+Example: 0b00011 0b10000 0 0b01010 |all .b
+Result: 0b11011
+
+| Combines two numbers using bitwise-xor.
+Pops two numbers from the stack.  Combines them bitwise using the "or"
+operator.  Pushes the result back on the stack.
+Example: 0b01001 0b10011 | .b
+Result: 0b11011
+
+|all Combines the entire stack using bitwise-xor.
+Pops the entire stack.  Combines all the number bitwise using the "or"
+operator.  Pushes the result back on the stack.
+Example: 0b00011 0b10000 0 0b01010 |all .b
+Result: 0b11011
+
 . Output the number on the top of the stack
 Pops the number on top of the stack and prints it in decimal.
 Example: 1 2 .
