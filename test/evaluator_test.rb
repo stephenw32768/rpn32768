@@ -30,7 +30,7 @@
 #
 
 require 'test/unit'
-require '../librpn32768'
+require_relative '../librpn32768'
 
 class EvaluatorTest < Test::Unit::TestCase
 
