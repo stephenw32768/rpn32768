@@ -39,50 +39,50 @@ class EvaluatorTest < Test::Unit::TestCase
   def test_stack_push_integer
     rpn = Evaluator.new
     rpn.eval("32768")
-    assert_equal rpn.stack, [32768]
+    assert_equal [32768], rpn.stack
   end
 
   def test_stack_push_float
     rpn = Evaluator.new
     rpn.eval("3276.8")
-    assert_equal rpn.stack, [3276.8]
+    assert_equal [3276.8], rpn.stack
   end
 
   def test_stack_exchange
     rpn = Evaluator.new
     rpn.eval("32768 xchg")
-    assert_equal rpn.stack, []
-    assert_equal rpn.secondary_stack, [32768]
+    assert_equal [], rpn.stack
+    assert_equal [32768], rpn.secondary_stack
   end
 
   def test_heap_store_load
     rpn = Evaluator.new
     rpn.eval("32768 0store 47 0load")
-    assert_equal rpn.stack, [47, 32768]
+    assert_equal  [47, 32768], rpn.stack
   end
 
   def test_stack_is_returned
     rpn = Evaluator.new
-    assert_equal rpn.eval("1 2 3"), [1, 2, 3]
+    assert_equal [1, 2, 3], rpn.eval("1 2 3")
   end
 
   def test_alias
     rpn = Evaluator.new
     rpn.eval("def tau 2 pi * end")
     rpn.eval("tau")
-    assert_equal rpn.stack, [2 * Math::PI]
+    assert_equal  [2 * Math::PI], rpn.stack
   end
 
   def test_print_binary
     rpn = Evaluator.new
     rpn.eval("3 .b") do |result|
-      assert_equal result, "0b11"
+      assert_equal "0b11", result
     end
   end
 
   def test_operator_addition
     rpn = Evaluator.new
     rpn.eval("1 2 +")
-    assert_equal rpn.stack, [3]
+    assert_equal [3], rpn.stack
   end
 end
