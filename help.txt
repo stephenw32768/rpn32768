@@ -40,6 +40,31 @@ on the stack.
 Example: 3 2*
 Result: 6
 
+sqr Multiplies a number by itself
+Pops a number from the stack, multiplies it by itself, and pushes the result
+back on the stack.
+Example: 3 sqr
+Result: 9
+
+sqrt Square root
+Pops a number from the stack, calculates its square root, and pushes the
+result back on the stack.
+Example: 81.0 sqrt
+Result: 9.0
+
+** Raises a number to a power
+Pops two numbers from the stack, raises the second to be popped by the power
+of the first to be popped, and pushes the result back on the stack.
+Example: 2 15 **
+Result: 32768
+
+root Nth root
+Pops two numbers from the stack.  The first to be popped is N.  Calculates
+the Nth root of the second to be popped, and pushes the result back on the
+stack.
+Example: 32768.0 15 root
+Result: 2.0
+
 / Divides a number by another
 Pops two numbers from the stack, divides the second to be popped by the
 first, and pushes the result back on the stack.
@@ -95,6 +120,30 @@ Pops the entire stack, multiplies all the numbers, and pushes the result back
 on the stack.
 Example: 2 3 4 productall
 Result: 24
+
+log Common logarithm
+Pops a number from the stack, calculates its common (base 10) logarithm, and
+pushes the result back on the stack.
+Example: 10000.0 log
+Result: 4.0
+
+log Natural logarithm
+Pops a number from the stack, calculates its natural (base e) logarithm, and
+pushes the result back on the stack.
+Example: e ln
+Result: 1.0
+
+e Euler's number
+Pushes Euler's number onto the stack.
+Example: e
+Result: 2.718281828459045
+Example: e 4 *
+Result: 10.87312731383618
+
+pi Pi
+Pushes pi onto the stack.
+Example: pi
+Result: 3.141592653589793
 
 . Output the number on the top of the stack
 Pops the number on top of the stack and prints it in decimal.
