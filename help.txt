@@ -133,8 +133,8 @@ pushes the result back on the stack.
 Example: e ln
 Result: 1.0
 
-e Euler's number
-Pushes Euler's number onto the stack.
+e Euler's number/Napier's constant
+Pushes e aka Euler's number aka Napier's constant onto the stack.
 Example: e
 Result: 2.718281828459045
 Example: e 4 *
@@ -144,6 +144,69 @@ pi Pi
 Pushes pi onto the stack.
 Example: pi
 Result: 3.141592653589793
+
+dtor Converts degrees to radians
+Pops a number from the stack.  Takes the popped number to be a number of
+degrees.  Pushes the corresponding number of radians back on the stack.
+Example: 180 dtor
+Result: 3.141592653589793
+
+rtod Converts radians to degrees
+Pops a number from the stack.  Takes the popped number to be a number of
+radians.  Pushes the corresponding number of degrees back on the stack.
+Example: pi 4 * rtod
+Result: 720.0
+
+sin Sine
+Pops a number from the stack.  Takes the popped number to be a number of
+radians.  Calculates the sine and pushes the result back on the stack.
+Example: pi 2 / sin
+Result: 1.0
+Example: 30 dtor sin
+Result: 0.49999999999999994 (floats are lovely...)
+
+asin Inverse sine
+Pops a number from the stack.  Takes the popped number to be the sine of a
+number of radians.  Calculates the inverse sine, yielding radians, and pushes
+the result back on the stack.
+Example: 1 asin 2 x
+Result: 3.141592653589793
+Example: 0.5 asin rtod
+Result: 30.000000000000004 (floats are lovely...)
+
+cos Cosine
+Pops a number from the stack.  Takes the popped number to be a number of
+radians.  Calculates the cosine and pushes the result back on the stack.
+Example: pi cos
+Result: -1.0
+Example: 60 dtor cos
+Result: 0.5000000000000001 (floats are lovely...)
+
+acos Inverse cosine
+Pops a number from the stack.  Takes the popped number to be the cosine of a
+number of radians.  Calculates the inverse cosine, yielding radians, and
+pushes the result back on the stack.
+Example: 1 acos
+Result: 3.141592653589793
+Example: 0.5 acos rtod
+Result: 60.00000000000001 (floats are lovely...)
+
+tan Tangent
+Pops a number from the stack.  Takes the popped number to be a number of
+radians.  Calculates the tangent and pushes the result back on the stack.
+Example: pi 4 / tan
+Result: 0.9999999999999999 (floats are lovely...)
+Example: 135 dtor tan
+Result: -1.0000000000000002
+
+atan Inverse tangent
+Pops a number from the stack.  Takes the popped number to be the tangent of a
+number of radians.  Calculates the inverse tangent, yielding radians, and
+pushes the result back on the stack.
+Example: 1 atan 4 *
+Result: 3.141592653589793
+Example: -1 atan rtod
+Result: -45
 
 . Output the number on the top of the stack
 Pops the number on top of the stack and prints it in decimal.
