@@ -242,7 +242,7 @@ module RPN32768
     end
   end
 
-  class Modulus < StackOperation
+  class AbsoluteValue < StackOperation
     def names
       ['abs']
     end
@@ -262,7 +262,7 @@ module RPN32768
 
   class Factorial < StackOperation
     def names
-      ['!']
+      ['!', 'fact']
     end
     def perform
       s.push(factorial(s.pop))

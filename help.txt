@@ -16,11 +16,17 @@ second, and pushes the result back on the stack.
 Example: 10 6 -
 Result: 4
 
-1-+ Decrements a number
+1- Decrements a number
 Pops a number from the stack, subtracts 1 from it, and pushes the result back
 on the stack.
 Example: 47 1-
 Result: 46
+
+neg Negates a number
+Pops a number from the stack, subtracts it from 0, and pushes the result back
+on the stack.
+Example: 47 neg
+Result: -47
 
 * Multiplies two numbers
 Pops two numbers from the stack, multiplies them, and pushes the result back
@@ -40,17 +46,55 @@ first, and pushes the result back on the stack.
 Example: 7 2.0 /
 Result: 3.5
 
+mod Modulo (remainder)
+Pops two numbers from the stack, divides the second to be popped by the
+first, and pushes the remainder back on the stack.
+Example: 15 4 mod
+Result: 3
+
+abs Absolute value
+Pops a number from the stack, calculates its absolute value, and pushes the
+result back on the stack.
+Example: 47 abs
+Result: 47
+Example: -47 abs
+Result: 47
+
+inv Reciprocal
+Pops a number from the stack, divides 1.0 by it, and pushes the result back
+on the stack.
+Example: 4 inv
+Result: 0.25
+
+! Factorial
+Pops a number from the stack, computes its factorial, and pushes the result
+back on the stack.
+Example: 7 !
+Result: 5040
+
 sum Adds n numbers
 Pops a number from the stack, pops that many more numbers from the stack,
 adds them up, and pushes the result back on the stack.
 Example: 5 5 5 5 3 sum
-Result: 5 15
+Result: Leaves 5 15 on the stack
 
 sumall Adds all the numbers on the stack
 Pops the entire stack, adds all the numbers, and pushes the result back on
 the stack.
 Example: 1 3 5 sumall
 Result: 9
+
+product Multiplies n numbers
+Pops a number from the stack, pops that many more numbers from the stack,
+multiplies them together, and pushes the result back on the stack.
+Example: 5 5 5 5 3 product
+Result: Leaves 5 125 on the stack
+
+productall Multiplies all the numbers on the stack
+Pops the entire stack, multiplies all the numbers, and pushes the result back
+on the stack.
+Example: 2 3 4 productall
+Result: 24
 
 . Output the number on the top of the stack
 Pops the number on top of the stack and prints it in decimal.
@@ -70,5 +114,5 @@ Result: Prints 0xa, leaves 1 on the stack
 depth Pushes the current size of the stack.
 Pushes the current size of the stack onto the stack.
 Example 100 200 300 depth
-Result: leaves 100 200 300 4 on the stack.
+Result: Leaves 100 200 300 4 on the stack
 
