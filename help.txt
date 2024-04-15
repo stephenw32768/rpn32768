@@ -4,11 +4,23 @@ stack.
 Example: 1 2 +
 Result: 3
 
+1+ Increments a number
+Pops a number from the stack, adds 1 to it, and pushes the result back on
+the stack.
+Example: 47 1+
+Result: 48
+
 - Subtracts a number from another
 Pops two numbers from the stack, subtracts the first to be popped from the
 second, and pushes the result back on the stack.
 Example: 10 6 -
 Result: 4
+
+1-+ Decrements a number
+Pops a number from the stack, subtracts 1 from it, and pushes the result back
+on the stack.
+Example: 47 1-
+Result: 46
 
 * Multiplies two numbers
 Pops two numbers from the stack, multiplies them, and pushes the result back
@@ -16,11 +28,23 @@ on the stack.
 Example: 3 2 *
 Result: 6
 
+2* Multiplies a number by 2
+Pops a number from the stack, multiplies it by 2, and pushes the result back
+on the stack.
+Example: 3 2*
+Result: 6
+
 / Divides a number by another
 Pops two numbers from the stack, divides the second to be popped by the
 first, and pushes the result back on the stack.
 Example: 7 2.0 /
 Result: 3.5
+
+sum Adds n numbers
+Pops a number from the stack, pops that many more numbers from the stack,
+adds them up, and pushes the result back on the stack.
+Example: 5 5 5 5 3 sum
+Result: 5 15
 
 sumall Adds all the numbers on the stack
 Pops the entire stack, adds all the numbers, and pushes the result back on
@@ -42,3 +66,9 @@ Result: Prints 0b11, leaves 1 on the stack
 Pops the number on top of the stack and prints it in hex.
 Example: 1 10 .x
 Result: Prints 0xa, leaves 1 on the stack
+
+depth Pushes the current size of the stack.
+Pushes the current size of the stack onto the stack.
+Example 100 200 300 depth
+Result: leaves 100 200 300 4 on the stack.
+
