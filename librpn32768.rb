@@ -1137,8 +1137,9 @@ module RPN32768
     def help
       return @help if defined?(@help)
 
-      # find the help on the load path
-      $LOAD_PATH.map{|p| "#{p}/rpn32768help.txt"}.each do |path|
+      # find the help in the current directory or on the load path
+
+      ([Dir.pwd] + $LOAD_PATH).map{|p| "#{p}/rpn32768help.txt"}.each do |path|
         if File.exist?(path)
           @help = {}
           # each help is delimited with a blank line
