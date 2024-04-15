@@ -11,8 +11,8 @@ Example: 10 6 -
 Result: 4
 
 * Multiplies two numbers
-Pops two numbers from the stack, multiplies them, and pushes the result back on the
-stack.
+Pops two numbers from the stack, multiplies them, and pushes the result back
+on the stack.
 Example: 3 2 *
 Result: 6
 

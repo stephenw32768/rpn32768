@@ -94,4 +94,20 @@ class EvaluatorTest < Test::Unit::TestCase
     end
     assert_not_empty output.filter{|s| s.match(/^sumall\s+Adds all the numbers on the stack$/)}
   end
+
+  def test_help_op
+    rpn = Evaluator.new
+    output = []
+    rpn.eval("help x") do |result|
+      output << result
+    end
+    assert_equal ["Operator: *",
+                  "Synonyms: x, *",
+                  "Multiplies two numbers",
+                  "",
+                  "Pops two numbers from the stack, multiplies them, and pushes the result back",
+                  "on the stack.",
+                  "Example: 3 2 *",
+                  "Result: 6"], output
+  end
 end

@@ -1142,9 +1142,26 @@ module RPN32768
 
     # Shows documentation
     def show_help
-      longest_op_name = help.keys.map{|s| s.length}.max
-      help.keys.sort.each do |op_name|
-        yield "#{op_name.ljust(longest_op_name)} #{help[op_name].short}"
+      if @sequence.has_next?
+        op = @operations[@sequence.next]
+        raise ParseException.new("no such operator \"#{@sequence.current}\"") unless op
+        h = op.names.map{|n| help[n]}.filter{|x| x}[0]
+        if h
+          yield "Operator: #{h.op_name}"
+          yield "Synonyms: #{op.names.join(", ")}" if op.names.length > 1
+          yield h.short
+          yield ''
+          h.full.each do |line|
+            yield line
+          end
+        else
+          yield "No help available for operator \"#{@sequence.current}\""
+        end
+      else 
+        longest_op_name = help.keys.map{|s| s.length}.max
+        help.keys.sort.each do |op_name|
+          yield "#{op_name.ljust(longest_op_name)} #{help[op_name].short}"
+        end
       end
     end
   end
