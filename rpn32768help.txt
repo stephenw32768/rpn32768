@@ -315,34 +315,50 @@ Result: Leaves 3 4 1 2 on the stack
 over Copies the second number from the top of the stack
 Pushes to the stack a copy of the number that is second from the top.
 Example: 1 2 3 over
-Result: Leaves 1 2 3 2 on the stack.
+Result: Leaves 1 2 3 2 on the stack
 
 2over Copies the second pair of numbers from the top of the stack
 Pushes to the stack a copy of the pair of numbers that is the second pair
 from the top.
 Example: 1 2 3 4 5 6 2over
-Result: Leaves 1 2 3 4 5 6 3 4 on the stack.
+Result: Leaves 1 2 3 4 5 6 3 4 on the stack
 
 drop Discards the number at the top of the stack
 Silently discards the number at the top of the stack.
 Example: 1 2 3 4 drop
-Result: Leaves 1 2 3 on the stack.
+Result: Leaves 1 2 3 on the stack
 
 2drop Discards the two numbers at the top of the stack
 Silently discards a pair of numbers at the top of the stack.
 Example: 1 2 3 4 2drop
-Result: Leaves 1 2 on the stack.
+Result: Leaves 1 2 on the stack
 
 nip Discards the number second from the top of the stack
 Silently discards the number second from the top of the stack.
 Example: 1 2 3 4 nip
-Result: Leaves 1 2 4 on the stack.
+Result: Leaves 1 2 4 on the stack
 
-tuck Copies the number at the top of the stack into third position.
+tuck Copies the number at the top of the stack into third position
 Makes a copy of the number at the top of the stack, inserting it so it
 is the new third item on the stack.
 Example: 1 2 3 4 tuck
-Result: Leaves 1 2 4 3 4 on the stack.
+Result: Leaves 1 2 4 3 4 on the stack
+
+to_i Converts a number to an integer
+Converts the number at the top of the stack to an integer.  If it is already
+an integer, leaves it alone.
+Example: 1 2 3 to_i
+Result: Leaves 1 2 3 on the stack
+Example: 1.0 2.0 3.0 to_i
+Result: Leaves 1.0 2.0 3 on the stack
+
+to_r Converts a number to a real
+Converts the number at the top of the stack to a real.  If it is already a
+a real, leaves it alone.
+Example: 1 2 3 to_r
+Result: Leaves 1 2 3.0 on the stack
+Example: 1.0 2.0 3.0 to_r
+Result: Leaves 1.0 2.0 3.0 on the stack
 
 . Output the number on the top of the stack
 Pops the number on top of the stack and prints it in decimal.
