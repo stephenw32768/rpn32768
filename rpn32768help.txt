@@ -258,6 +258,26 @@ operator.  Pushes the result back on the stack.
 Example: 0b00111 0b10000 0 0b01100 ^all .b
 Result: 0b11011
 
+~ Negates an integer bitwise.
+Pops a number from the stack.  Negates the number bitwise, two's complement.
+Pushes the result back on the stack.
+Example: 0b01001 ~ .b
+Result: 0b..10110
+
+<< Shifts a number left N bits.
+Pops two numbers from the stack.  The first to be popped is N.  Shifts the
+bits in the second number to be popped left N places.  Pushes the result back
+on the stack.
+Example: 0b1001 3 << .b
+Result: 0b1001000
+
+>> Shifts a number right N bits.
+Pops two numbers from the stack.  The first to be popped is N.  Shifts the
+bits in the second number to be popped right N places.  Pushes the result back
+on the stack.
+Example: 0b1001010 3 >> .b
+Result: 0b1001
+
 . Output the number on the top of the stack
 Pops the number on top of the stack and prints it in decimal.
 Example: 1 2 .
