@@ -246,16 +246,16 @@ operator.  Pushes the result back on the stack.
 Example: 0b00011 0b10000 0 0b01010 |all .b
 Result: 0b11011
 
-| Combines two numbers using bitwise-xor.
-Pops two numbers from the stack.  Combines them bitwise using the "or"
+^ Combines two numbers using bitwise-xor.
+Pops two numbers from the stack.  Combines them bitwise using the "xor"
 operator.  Pushes the result back on the stack.
-Example: 0b01001 0b10011 | .b
-Result: 0b11011
+Example: 0b01001 0b10011 ^ .b
+Result: 0b11010
 
-|all Combines the entire stack using bitwise-xor.
-Pops the entire stack.  Combines all the number bitwise using the "or"
+^all Combines the entire stack using bitwise-xor.
+Pops the entire stack.  Combines all the number bitwise using the "xor"
 operator.  Pushes the result back on the stack.
-Example: 0b00011 0b10000 0 0b01010 |all .b
+Example: 0b00111 0b10000 0 0b01100 ^all .b
 Result: 0b11011
 
 . Output the number on the top of the stack
