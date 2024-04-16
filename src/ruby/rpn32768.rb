@@ -93,7 +93,7 @@ begin
 
   # print anything left on the stack
   while rpn.stack.size > 0
-    puts(rpn.stack.pop)
+    puts("#{rpn.stack.pop}")
   end
 
 rescue RPNException => ex
