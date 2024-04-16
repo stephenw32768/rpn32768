@@ -222,61 +222,127 @@ onto the stack.
 Example: 37.0 ctof
 Result: 98.6
 
-& Combines two numbers using bitwise-and.
+& Combines two numbers using bitwise-and
 Pops two numbers from the stack.  Combines them bitwise using the "and"
 operator.  Pushes the result back on the stack.
 Example: 0b11011 0b10110 & .b
 Result: 0b10010
 
-&all Combines the entire stack using bitwise-and.
+&all Combines the entire stack using bitwise-and
 Pops the entire stack.  Combines all the number bitwise using the "and"
 operator.  Pushes the result back on the stack.
 Example: 0b11011 0b10110 0b11101 &all .b
 Result: 0b10000
 
-| Combines two numbers using bitwise-or.
+| Combines two numbers using bitwise-or
 Pops two numbers from the stack.  Combines them bitwise using the "or"
 operator.  Pushes the result back on the stack.
 Example: 0b01001 0b10011 | .b
 Result: 0b11011
 
-|all Combines the entire stack using bitwise-or.
+|all Combines the entire stack using bitwise-or
 Pops the entire stack.  Combines all the number bitwise using the "or"
 operator.  Pushes the result back on the stack.
 Example: 0b00011 0b10000 0 0b01010 |all .b
 Result: 0b11011
 
-^ Combines two numbers using bitwise-xor.
+^ Combines two numbers using bitwise-xor
 Pops two numbers from the stack.  Combines them bitwise using the "xor"
 operator.  Pushes the result back on the stack.
 Example: 0b01001 0b10011 ^ .b
 Result: 0b11010
 
-^all Combines the entire stack using bitwise-xor.
+^all Combines the entire stack using bitwise-xor
 Pops the entire stack.  Combines all the number bitwise using the "xor"
 operator.  Pushes the result back on the stack.
 Example: 0b00111 0b10000 0 0b01100 ^all .b
 Result: 0b11011
 
-~ Negates an integer bitwise.
+~ Negates an integer bitwise
 Pops a number from the stack.  Negates the number bitwise, two's complement.
 Pushes the result back on the stack.
 Example: 0b01001 ~ .b
 Result: 0b..10110
 
-<< Shifts a number left N bits.
+<< Shifts a number left N bits
 Pops two numbers from the stack.  The first to be popped is N.  Shifts the
 bits in the second number to be popped left N places.  Pushes the result back
 on the stack.
 Example: 0b1001 3 << .b
 Result: 0b1001000
 
->> Shifts a number right N bits.
+>> Shifts a number right N bits
 Pops two numbers from the stack.  The first to be popped is N.  Shifts the
 bits in the second number to be popped right N places.  Pushes the result back
 on the stack.
 Example: 0b1001010 3 >> .b
 Result: 0b1001
+
+dup Duplicates the number on top of the stack
+Pushes to the stack a copy of the number currently at the top of the stack.
+Example: 1 2 3 dup
+Result: Leaves 1 2 3 3 on the stack
+
+?dup Duplicates the number on top of the stack if it is non-zero
+Pushes to the stack a copy of the number currently at the top of the stack,
+but only if it is non-zero.
+Example: 1 2 0 ?dup 3 ?dup
+Result: Leaves 1 2 0 3 3 on the stack
+
+rot Rotates the top three numbers on the stack
+Rearranges the top three numbers on the stack, moving the third from the top
+to the top, and preserving the order of the other two.
+Example: 1 2 3 4 rot
+Result: Leaves 1 3 4 2 on the stack
+
+-rot Rotates the top three numbers on the stack backwards
+Rearranges the top three numbers on the stack, moving the top into the third
+position and preserving the order of the other two.
+Example: 1 2 3 4 -rot
+Result: Leaves 1 4 2 3 on the stack
+
+swap Exchanges the numbers on the top of the stack
+Pops two numbers from the stack and pushes them back in reverse order.
+Example: 1 2 3 4 swap
+Result: Leaves 1 2 4 3 on the stack
+
+2swap Exchanges pairs of numbers on the top of the stack
+Pops two pairs of numbers from the stack and pushes the pairs back in reverse
+order.  Preserves the order within each pair.
+Example: 1 2 3 4 2swap
+Result: Leaves 3 4 1 2 on the stack
+
+over Copies the second number from the top of the stack
+Pushes to the stack a copy of the number that is second from the top.
+Example: 1 2 3 over
+Result: Leaves 1 2 3 2 on the stack.
+
+2over Copies the second pair of numbers from the top of the stack
+Pushes to the stack a copy of the pair of numbers that is the second pair
+from the top.
+Example: 1 2 3 4 5 6 2over
+Result: Leaves 1 2 3 4 5 6 3 4 on the stack.
+
+drop Discards the number at the top of the stack
+Silently discards the number at the top of the stack.
+Example: 1 2 3 4 drop
+Result: Leaves 1 2 3 on the stack.
+
+2drop Discards the two numbers at the top of the stack
+Silently discards a pair of numbers at the top of the stack.
+Example: 1 2 3 4 2drop
+Result: Leaves 1 2 on the stack.
+
+nip Discards the number second from the top of the stack
+Silently discards the number second from the top of the stack.
+Example: 1 2 3 4 nip
+Result: Leaves 1 2 4 on the stack.
+
+tuck Copies the number at the top of the stack into third position.
+Makes a copy of the number at the top of the stack, inserting it so it
+is the new third item on the stack.
+Example: 1 2 3 4 tuck
+Result: Leaves 1 2 4 3 4 on the stack.
 
 . Output the number on the top of the stack
 Pops the number on top of the stack and prints it in decimal.
