@@ -112,7 +112,7 @@ module RPN32768
       end
     end
 
-    attr_reader :heap, :stack, :secondary_stack, :help
+    attr_reader :heap, :stack, :secondary_stack
 
 
     # Constructor
