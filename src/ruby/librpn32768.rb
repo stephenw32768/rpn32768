@@ -33,17 +33,7 @@
 #noinspection RubyInstanceVariableNamingConvention,RubyClassModuleNamingConvention,RubyLiteralArrayInspection
 module RPN32768
 
-  # Things can go wrong...
-  class RPNException < StandardError
-  end
-  class ParseException < RPNException
-  end
-  class OperandOutOfRangeException < RPNException
-    def initialize(msg = 'operand out of range')
-      super(msg)
-    end
-  end
-
+  require_relative 'librpn32768/exceptions'
 
   # marker superclass from which all calculator operation classes inherit
   class Operation
