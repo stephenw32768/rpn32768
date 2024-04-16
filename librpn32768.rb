@@ -1204,9 +1204,7 @@ module RPN32768
 
       yield ''
       yield "For a full description of OPERATOR, use 'help OPERATOR'."
-      if !show_synonyms
-        yield "Some operators have synonyms, use 'help full' for a complete list."
-      end
+      yield "Some operators have synonyms, use 'help full' for a complete list." unless show_synonyms
     end
   end
 end
