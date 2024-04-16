@@ -302,15 +302,15 @@ module RPN32768
     def show_op_help(op)
       h = op.names.map { |n| help[n] }.filter { |x| x }[0]
       if h
-        yield "Operator: #{h.op_name}"
-        yield "Synonyms: #{op.names.join(", ")}" if op.names.length > 1
-        yield h.short
-        yield ''
+        yield "Operator: #{h.op_name}\n"
+        yield "Synonyms: #{op.names.join(", ")}\n" if op.names.length > 1
+        yield "#{h.short}\n"
+        yield "\n"
         h.full.each do |line|
-          yield line
+          yield "#{line}\n"
         end
       else
-        yield "No help available for operator \"#{@sequence.current}\""
+        yield "No help available for operator \"#{@sequence.current}\"\n"
       end
     end
 
@@ -328,11 +328,11 @@ module RPN32768
           list << "#{synonym.ljust(longest_op_name)} #{help[op_name].short}"
         end
       end
-      list.sort.each { |x| yield x }
+      list.sort.each { |x| yield "#{x}\n" }
 
-      yield ''
-      yield "For a full description of OPERATOR, use 'help OPERATOR'."
-      yield "Some operators have synonyms, use 'help full' for a complete list." unless show_synonyms
+      yield "\n"
+      yield "For a full description of OPERATOR, use 'help OPERATOR'.\n"
+      yield "Some operators have synonyms, use 'help full' for a complete list.\n" unless show_synonyms
     end
   end
 end

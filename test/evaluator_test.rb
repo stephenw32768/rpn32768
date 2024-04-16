@@ -92,7 +92,7 @@ class EvaluatorTest < Test::Unit::TestCase
     rpn.eval("help") do |result|
       output << result
     end
-    assert_not_empty output.filter{|s| s.match(/^sumall\s+Adds all the numbers on the stack$/)}
+    assert_not_empty output.filter{|s| s.match(/^sumall\s+Adds all the numbers on the stack\n$/)}
   end
 
   def test_help_full
@@ -101,8 +101,8 @@ class EvaluatorTest < Test::Unit::TestCase
     rpn.eval("help full") do |result|
       output << result
     end
-    assert_not_empty output.filter{|s| s.match(/^\*\s+Multiplies two numbers$/)}
-    assert_not_empty output.filter{|s| s.match(/^x\s+Multiplies two numbers$/)}
+    assert_not_empty output.filter{|s| s.match(/^\*\s+Multiplies two numbers\n$/)}
+    assert_not_empty output.filter{|s| s.match(/^x\s+Multiplies two numbers\n$/)}
   end
 
   def test_help_op
@@ -111,13 +111,13 @@ class EvaluatorTest < Test::Unit::TestCase
     rpn.eval("help x") do |result|
       output << result
     end
-    assert_equal ["Operator: *",
-                  "Synonyms: x, *",
-                  "Multiplies two numbers",
-                  "",
-                  "Pops two numbers from the stack, multiplies them, and pushes the result back",
-                  "on the stack.",
-                  "Example: 3 2 *",
-                  "Result: 6"], output
+    assert_equal ["Operator: *\n",
+                  "Synonyms: x, *\n",
+                  "Multiplies two numbers\n",
+                  "\n",
+                  "Pops two numbers from the stack, multiplies them, and pushes the result back\n",
+                  "on the stack.\n",
+                  "Example: 3 2 *\n",
+                  "Result: 6\n"], output
   end
 end

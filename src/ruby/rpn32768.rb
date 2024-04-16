@@ -59,7 +59,11 @@ def interactive(rpn)
     printed = false
     begin
       rpn.eval(STRIP_COMMENT.match(line)[1]) do |x|
-        print("#{x} ")
+        if x.is_a?(String) && x.end_with?("\n")
+          puts(x)
+        else
+          print("#{x} ")
+        end
         printed = true
       end
     rescue RPNException => ex
