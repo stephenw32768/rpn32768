@@ -41,14 +41,14 @@ module RPN32768
   # to handle, so we'll make a stack subclass that does just that
   class Stack < Array
     def pop
-      raise StackUnderflowException.new(nil, self) if size == 0
+      raise StackUnderflowException.new(stack = self) if size == 0
       super
     end
   end
   class StackUnderflowException < RPNException
     attr_reader :stack
 
-    def initialize(msg = nil, stack = nil)
+    def initialize(msg = 'stack underflow', stack)
       super(msg)
       @stack = stack
     end
@@ -178,16 +178,16 @@ module RPN32768
             stack.push(parse_current)
           end
 
-        rescue StackUnderflowException
+        rescue StackUnderflowException => ex
           # which stack was it?
-          itwas = ($!.stack.equal?(stack)) ? "stack" : "secondary stack"
+          itwas = (ex.stack.equal?(stack)) ? "stack" : "secondary stack"
           posn = sequence.position
           raise StackUnderflowException \
-            .new("#{itwas} underflow at argument #{posn} (\"#{arg}\")")
-        rescue OperandOutOfRangeException
+            .new("#{itwas} underflow at argument #{posn} (\"#{arg}\")", ex.stack)
+        rescue OperandOutOfRangeException => ex
           # rethrow with context
           posn = sequence.position
-          raise $!.class.new("#{$!.message} at argument #{posn} (\"#{arg}\")")
+          raise ex.class.new("#{ex.message} at argument #{posn} (\"#{arg}\")")
         end
       end
 

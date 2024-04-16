@@ -62,8 +62,8 @@ def interactive(rpn)
         print("#{x} ")
         printed = true
       end
-    rescue RPNException
-      STDERR.puts($!.message)
+    rescue RPNException => ex
+      STDERR.puts(ex.message)
     end
     puts if printed
     STDERR.print("rpn> ")
@@ -96,7 +96,7 @@ begin
     puts(rpn.stack.pop)
   end
 
-rescue RPNException
-  STDERR.puts($!.message)
+rescue RPNException => ex
+  STDERR.puts(ex.message)
   exit(1)
 end
