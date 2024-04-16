@@ -375,6 +375,11 @@ Pops the number on top of the stack and prints it in hex.
 Example: 1 10 .x
 Result: Prints 0xa, leaves 1 on the stack
 
+.s Print the contents of the stack
+Displays the current state of the stack without popping anything.
+Example 1 2 3 .s
+Result: Prints 1 2 3, leaves 1 2 3 on the stack
+
 depth Pushes the current size of the stack.
 Pushes the current size of the stack onto the stack.
 Example 100 200 300 depth
